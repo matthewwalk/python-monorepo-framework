@@ -1,4 +1,3 @@
-from distutils.command.config import config
 import psycopg2
 from utils.utils import defaulter
 import logging
