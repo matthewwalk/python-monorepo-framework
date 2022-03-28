@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    image: monorepo
+    container_name: monorepo
+    restart: always
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    environment:
+      GRPC_PORT: ${GRPC_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: postgres
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_HOST: redis
+      REDIS_TTL: ${REDIS_TTL}
+      REDIS_PROFILE_DB: ${REDIS_PROFILE_DB}
+      REDIS_MESSAGE_DB: ${REDIS_MESSAGE_DB}
+      REDIS_MATCH_DB: ${REDIS_MATCH_DB}
+      REDIS_REC_DB: ${REDIS_REC_DB}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+      - cache
+    links:
+      - db
+      - cache
+
+  db:
+    image: postgres:12.10
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  cache:
+    image: redis # pull redis
+    container_name: redis
+    restart: always
+    volumes:
+      - /tmp/data:/data
+      # - ALLOW_EMPTY_PASSWORD=yes # TODO: CHANGE THIS FOR SECURITY
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
